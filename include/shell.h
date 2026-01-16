@@ -1,8 +1,12 @@
-//
-// Created by chira on 16-01-2026.
-//
+#ifndef SHELL_H
+#define SHELL_H
 
-#ifndef MINI_LINUX_SHELL_SHELL_H
-#define MINI_LINUX_SHELL_SHELL_H
+class Shell {
+public:
+    void run();
 
-#endif //MINI_LINUX_SHELL_SHELL_H
+private:
+    void printPrompt();
+};
+
+#endif

@@ -4,4 +4,9 @@ project(minishell)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(minishell main.cpp)
+add_executable(minishell
+        main.cpp
+        src/shell.cpp
+        src/executer.cpp
+)
+
