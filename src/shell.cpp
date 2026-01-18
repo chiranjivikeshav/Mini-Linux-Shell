@@ -1,19 +1,38 @@
+#include "shell.h"
+#include "executer.h"
+
 #include<iostream>
 #include<string>
-#include "../include/shell.h"
+
+void Shell::printPrompt()
+{
+    std::cout<<"$ ";
+    std::cout.flush();
+}
+
 void Shell::run()
 {
+    std::string command;
+    Executer executer;
     while (true)
     {
-        std::cout << "$ ";
-        std::string line;
-        std::getline(std::cin, line);
+        printPrompt();
 
-        if (line == "exit")
+        if (!std::getline(std::cin, command))
+        {
+            break;
+        }
+
+        if (command.empty())
+        {
+            continue;
+        }
+
+        if (command == "exit")
         {
             return;
         }
 
-        // execute(line);
+        executer.execute(command);
     }
 }
