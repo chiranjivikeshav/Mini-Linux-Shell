@@ -1,8 +1,13 @@
-//
-// Created by chira on 16-01-2026.
-//
+#ifndef PARSER_H
+#define PARSER_H
 
-#ifndef MINI_LINUX_SHELL_PARSER_H
-#define MINI_LINUX_SHELL_PARSER_H
+#include "command.h"
+#include <string>
 
-#endif //MINI_LINUX_SHELL_PARSER_H
+class Parser
+{
+    public:
+    Command parse(const std::string& input);
+};
+
+#endif

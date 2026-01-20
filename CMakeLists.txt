@@ -10,5 +10,6 @@ add_executable(minishell
         main.cpp
         src/shell.cpp
         src/executer.cpp
+        src/parser.cpp
 )
 
