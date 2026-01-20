@@ -5,8 +5,11 @@
 
 class Executor
 {
-    public:
+public:
     void execute(const Command& cmd);
+
+private:
+    void handleCD(const Command& cmd);
 };
 
 #endif

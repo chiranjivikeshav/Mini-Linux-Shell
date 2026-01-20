@@ -4,6 +4,7 @@
 #include <sys/wait.h>
 #include <iostream>
 #include <vector>
+#include <string>
 
 void Executor::execute(const Command& cmd)
 {
@@ -22,10 +23,33 @@ void Executor::execute(const Command& cmd)
             argv.push_back(const_cast<char*>(arg.c_str()));
         argv.push_back(nullptr);
 
-        execvp(cmd.name.c_str(), argv.data());
+        if (cmd.name == "cd")
+        {
+            handleCD(cmd);
+        }else
+        {
+            execvp(cmd.name.c_str(), argv.data());
+        }
 
         perror("execution failed");
         _exit(1);
     }
     waitpid(pid, nullptr, 0);
+}
+
+void Executor::handleCD(const Command& cmd)
+{
+    std::string targetDir;
+    if (cmd.args.size() == 1 || cmd.args[1] == "~")
+    {
+        targetDir = getenv("HOME");
+    }else
+    {
+        targetDir = cmd.args[1];
+    }
+    std::cout<<"targetDir: "<<targetDir<<std::endl;
+    if (chdir(targetDir.c_str()) < 0)
+    {
+        perror("command failed");
+    }
 }
