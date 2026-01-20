@@ -23,17 +23,11 @@ void Shell::run()
         if (!std::getline(std::cin, command))
         {
             break;
-        }
-
-        if (command.empty())
+        }else if (command.empty())
         {
             continue;
         }
 
-        if (command == "exit")
-        {
-            return;
-        }
         Command cmd = parser.parse(command);
         executor.execute(cmd);
     }
