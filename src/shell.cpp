@@ -1,5 +1,6 @@
 #include "shell.h"
-#include "executer.h"
+#include "parser.h"
+#include "executor.h"
 
 #include<iostream>
 #include<string>
@@ -13,7 +14,8 @@ void Shell::printPrompt()
 void Shell::run()
 {
     std::string command;
-    Executer executer;
+    Parser parser;
+    Executor executor;
     while (true)
     {
         printPrompt();
@@ -32,7 +34,7 @@ void Shell::run()
         {
             return;
         }
-
-        executer.execute(command);
+        Command cmd = parser.parse(command);
+        executor.execute(cmd);
     }
 }

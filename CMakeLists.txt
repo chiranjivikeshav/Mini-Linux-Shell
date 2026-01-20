@@ -9,7 +9,7 @@ include_directories(include)
 add_executable(minishell
         main.cpp
         src/shell.cpp
-        src/executer.cpp
+        src/executor.cpp
         src/parser.cpp
 )
 
