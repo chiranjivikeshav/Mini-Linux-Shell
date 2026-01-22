@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fcntl.h>
 
 void Executor::execute(const Command& cmd)
 {
@@ -32,6 +33,7 @@ void Executor::execute(const Command& cmd)
             argv.push_back(const_cast<char*>(arg.c_str()));
         argv.push_back(nullptr);
 
+        handleRedirection(cmd);
         execvp(cmd.name.c_str(), argv.data());
 
         perror("execution failed");
@@ -53,5 +55,23 @@ void Executor::handleCD(const Command& cmd)
     if (chdir(targetDir.c_str()) < 0)
     {
         perror("command failed");
+    }
+}
+
+void Executor::handleRedirection(const Command& cmd)
+{
+    if (!cmd.inputFile.empty()) {
+        int fd = open(cmd.inputFile.c_str(), O_RDONLY);
+        dup2(fd, STDIN_FILENO);
+        close(fd);
+    }
+
+    if (!cmd.outputFile.empty()) {
+        int flags = O_WRONLY | O_CREAT;
+        flags |= cmd.append ? O_APPEND : O_TRUNC;
+
+        int fd = open(cmd.outputFile.c_str(), flags, 0644);
+        dup2(fd, STDOUT_FILENO);
+        close(fd);
     }
 }

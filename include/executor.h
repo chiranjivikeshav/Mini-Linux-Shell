@@ -10,6 +10,7 @@ public:
 
 private:
     void handleCD(const Command& cmd);
+    void handleRedirection(const Command& cmd);
 };
 
 #endif
