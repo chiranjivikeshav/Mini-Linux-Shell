@@ -3,15 +3,13 @@
 
 #include<vector>
 #include<string>
+#include<redirection.h>
 
 struct Command
 {
     std::string name;
     std::vector<std::string> args;
-
-    std::string inputFile; // for <
-    std::string outputFile; // for >
-    bool append = false; // for >>
+    std::vector<Redirection>redirections;
 };
 
 #endif
