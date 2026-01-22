@@ -13,29 +13,36 @@ Command Parser::parse(const std::string& input)
     std:: string arg;
     while (iss >> arg)
     {
-        if (arg == ">") {
-            if (!(iss >> cmd.outputFile)) {
-                std::cerr << "syntax error: expected file after >\n";
+        if (arg == ">" || arg == ">>" || arg == "<" || arg == "2>") {
+            std::string tempFile;
+            if (!(iss >> tempFile)) {
+                std::cerr << "syntax error: expected file after " << arg << "\n";
                 break;
             }
-            cmd.append = false;
-        }
-        else if (arg == ">>") {
-            if (!(iss >> cmd.outputFile)) {
-                std::cerr << "syntax error: expected file after >>\n";
-                break;
-            }
-            cmd.append = true;
-        }
-        else if (arg == "<") {
-            if (!(iss >> cmd.inputFile)) {
-                std::cerr << "syntax error: expected file after <\n";
-                break;
-            }
+            Redirection rd;
+            setRedirectionType(arg, rd);
+            rd.file = tempFile;
+            cmd.redirections.push_back(rd);
         }
         else {
             cmd.args.push_back(arg);
         }
     }
     return cmd;
+}
+
+void setRedirectionType(const std::string& arg, Redirection& rd)
+{
+    if (arg == ">") {
+        rd.type = RedirectType::OUTPUT;
+    }
+    else if (arg == ">>") {
+        rd.type = RedirectType::APPEND;
+    }
+    else if (arg == "<") {
+        rd.type = RedirectType::INPUT;
+    }
+    else if (arg == "2>") {
+        rd.type = RedirectType::STDERR;
+    }
 }
