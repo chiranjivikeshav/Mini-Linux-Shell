@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <fcntl.h>
+#include <cstdlib>
 
 void Executor::execute(const Command& cmd)
 {
@@ -33,7 +34,7 @@ void Executor::execute(const Command& cmd)
             argv.push_back(const_cast<char*>(arg.c_str()));
         argv.push_back(nullptr);
 
-        handleRedirection(cmd);
+        handleRedirection(cmd.redirections);
         execvp(cmd.name.c_str(), argv.data());
 
         perror("execution failed");
@@ -58,20 +59,38 @@ void Executor::handleCD(const Command& cmd)
     }
 }
 
-void Executor::handleRedirection(const Command& cmd)
+void Executor::handleRedirection(const std::vector<Redirection>& rds)
 {
-    if (!cmd.inputFile.empty()) {
-        int fd = open(cmd.inputFile.c_str(), O_RDONLY);
-        dup2(fd, STDIN_FILENO);
-        close(fd);
+    for (auto& r : rds) {
+        switch (r.type) {
+        case RedirectType::INPUT:
+            redirect(0, r.file, O_RDONLY);
+            break;
+        case RedirectType::OUTPUT:
+            redirect(1, r.file, O_WRONLY|O_CREAT|O_TRUNC);
+            break;
+        case RedirectType::APPEND:
+            redirect(1, r.file, O_WRONLY|O_CREAT|O_APPEND);
+            break;
+        case RedirectType::STDERR:
+            redirect(2, r.file, O_WRONLY|O_CREAT|O_TRUNC);
+            break;
+        }
+    }
+}
+
+void Executor::redirect(const int targetFd, const std::string& file, const int flags)
+{
+    int fd = open(file.c_str(), flags, 0644);
+    if (fd < 0) {
+        perror("redirection failed");
+        exit(1);
     }
 
-    if (!cmd.outputFile.empty()) {
-        int flags = O_WRONLY | O_CREAT;
-        flags |= cmd.append ? O_APPEND : O_TRUNC;
-
-        int fd = open(cmd.outputFile.c_str(), flags, 0644);
-        dup2(fd, STDOUT_FILENO);
-        close(fd);
+    if (dup2(fd, targetFd) < 0) {
+        perror("dup2 failed");
+        exit(1);
     }
+
+    close(fd);
 }

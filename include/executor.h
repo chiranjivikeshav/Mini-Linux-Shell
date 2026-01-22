@@ -2,6 +2,7 @@
 #define EXECUTER_H
 
 #include "command.h"
+#include "redirection.h"
 
 class Executor
 {
@@ -10,7 +11,8 @@ public:
 
 private:
     void handleCD(const Command& cmd);
-    void handleRedirection(const Command& cmd);
+    void handleRedirection(const std::vector<Redirection>& rds);
+    void redirect(int targetFd, const std::string& file, int flags);
 };
 
 #endif

@@ -10,7 +10,7 @@ class Parser
 public:
     Command parse(const std::string& input);
 private:
-    void getRedirection(const std::string& arg, Redirection& rd);
+    void setRedirectionType(const std::string& arg, Redirection& rd);
 };
 
 #endif

@@ -31,7 +31,7 @@ Command Parser::parse(const std::string& input)
     return cmd;
 }
 
-void setRedirectionType(const std::string& arg, Redirection& rd)
+void Parser::setRedirectionType(const std::string& arg, Redirection& rd)
 {
     if (arg == ">") {
         rd.type = RedirectType::OUTPUT;
