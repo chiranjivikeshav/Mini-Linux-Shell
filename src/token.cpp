@@ -2,7 +2,7 @@
 #include <sstream>
 #include <vector>
 
-std::vector<Token> tokenize(const std::string& input) {
+std::vector<Token> Tokenizer::tokenize(const std::string& input) {
     std::istringstream iss(input);
     std::vector<Token> tokens;
     std::string s;

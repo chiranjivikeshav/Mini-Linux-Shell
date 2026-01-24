@@ -2,6 +2,7 @@
 #define TOKEN_H
 
 #include <string>
+#include <vector>
 
 enum class TokenType {
     WORD,
@@ -18,4 +19,10 @@ struct Token {
     std::string value;
 };
 
+class Tokenizer
+{
+    public:
+    std::vector<Token> tokenize(const std::string& input);
+
+};
 #endif
