@@ -1,10 +1,13 @@
 #include "shell.h"
 #include "parser.h"
-#include "executor.h"
 #include "token.h"
+#include "ASTNode.h"
+#include "AST_executor.h"
+
 
 #include<iostream>
 #include<string>
+#include<memory>
 
 void Shell::printPrompt()
 {
@@ -16,6 +19,7 @@ void Shell::run()
 {
     std::string command;
     Tokenizer tokenizer;
+    ASTExecutor executor;
     while (true)
     {
         printPrompt();
@@ -30,6 +34,7 @@ void Shell::run()
 
         std::vector<Token> tokens = tokenizer.tokenize(command);
         Parser parser(tokens);
-        // executor.execute(cmd);
+        std::unique_ptr<ASTNode> root = parser.parse();
+        executor.execute(root.get());
     }
 }
