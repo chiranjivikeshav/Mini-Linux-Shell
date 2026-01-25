@@ -1,6 +1,7 @@
 #include "shell.h"
 #include "parser.h"
 #include "executor.h"
+#include "token.h"
 
 #include<iostream>
 #include<string>
@@ -14,8 +15,7 @@ void Shell::printPrompt()
 void Shell::run()
 {
     std::string command;
-    Parser parser;
-    Executor executor;
+    Tokenizer tokenizer;
     while (true)
     {
         printPrompt();
@@ -28,7 +28,8 @@ void Shell::run()
             continue;
         }
 
-        Command cmd = parser.parse(command);
-        executor.execute(cmd);
+        std::vector<Token> tokens = tokenizer.tokenize(command);
+        Parser parser(tokens);
+        // executor.execute(cmd);
     }
 }

@@ -1,33 +1,83 @@
 #include "parser.h"
+#include "command.h"
 #include <sstream>
-#include <iostream>
 
-Command Parser::parse(const std::string& input)
+Parser::Parser(std::vector<Token>& t):tokens(t), pos(0)
 {
-    std::istringstream iss(input);
-    Command cmd;
-    iss >> cmd.name;
 
-    cmd.args.push_back(cmd.name);
+}
 
-    std:: string arg;
-    while (iss >> arg)
-    {
-        if (arg == ">" || arg == ">>" || arg == "<" || arg == "2>") {
-            std::string tempFile;
-            if (!(iss >> tempFile)) {
-                std::cerr << "syntax error: expected file after " << arg << "\n";
-                break;
-            }
-            Redirection rd;
-            setRedirectionType(arg, rd);
-            rd.file = tempFile;
-            cmd.redirections.push_back(rd);
-        }
-        else {
-            cmd.args.push_back(arg);
-        }
+std::unique_ptr<ASTNode> Parser::parse()
+{
+    return parseSequence();
+}
+
+std::unique_ptr<ASTNode> Parser::parseSequence() {
+    auto node = parseLogical();
+
+    while (match(TokenType::SEQUENCE)) {
+        auto right = parseLogical();
+        auto parent = std::make_unique<ASTNode>();
+        parent->type = NodeType::SEQUENCE;
+        parent->left = std::move(node);
+        parent->right = std::move(right);
+        node = std::move(parent);
     }
+    return node;
+}
+
+std::unique_ptr<ASTNode> Parser::parseLogical() {
+    auto node = parsePipeline();
+
+    while (match(TokenType::AND) || match(TokenType::OR)) {
+        NodeType type = tokens[pos-1].type == TokenType::AND
+                        ? NodeType::AND
+                        : NodeType::OR;
+
+        auto right = parsePipeline();
+        auto parent = std::make_unique<ASTNode>();
+        parent->type = type;
+        parent->left = std::move(node);
+        parent->right = std::move(right);
+        node = std::move(parent);
+    }
+    return node;
+}
+
+std::unique_ptr<ASTNode> Parser::parsePipeline() {
+    auto node = parseCommand();
+
+    while (match(TokenType::PIPE)) {
+        auto right = parseCommand();
+        auto parent = std::make_unique<ASTNode>();
+        parent->type = NodeType::PIPE;
+        parent->left = std::move(node);
+        parent->right = std::move(right);
+        node = std::move(parent);
+    }
+    return node;
+}
+
+std::unique_ptr<ASTNode> Parser::parseCommand() {
+    auto cmd = std::make_unique<Command>();
+
+    while (peek().type == TokenType::WORD) {
+        cmd->args.push_back(peek().value);
+        pos++;
+    }
+
+    while (peek().type == TokenType::REDIRECT) {
+        Redirection rd;
+        std::string op = peek().value;
+        pos++;
+
+        rd.file = peek().value;
+        setRedirectionType(op, rd);
+        pos++;
+
+        cmd->redirections.push_back(rd);
+    }
+
     return cmd;
 }
 
@@ -45,4 +95,16 @@ void Parser::setRedirectionType(const std::string& arg, Redirection& rd)
     else if (arg == "2>") {
         rd.type = RedirectType::STDERR;
     }
+}
+
+bool Parser::match(TokenType type) {
+    if (peek().type == type) {
+        pos++;
+        return true;
+    }
+    return false;
+}
+
+const Token& Parser::peek() {
+    return tokens[pos];
 }
