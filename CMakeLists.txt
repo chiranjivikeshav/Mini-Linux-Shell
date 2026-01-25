@@ -12,5 +12,6 @@ add_executable(minishell
         src/executor.cpp
         src/parser.cpp
         src/token.cpp
+        src/AST_executor.cpp
 )
 
