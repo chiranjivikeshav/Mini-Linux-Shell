@@ -84,12 +84,12 @@ void Executor::redirect(const int targetFd, const std::string& file, const int f
     int fd = open(file.c_str(), flags, 0644);
     if (fd < 0) {
         perror("redirection failed");
-        exit(1);
+        _exit(1);
     }
 
     if (dup2(fd, targetFd) < 0) {
         perror("dup2 failed");
-        exit(1);
+        _exit(1);
     }
 
     close(fd);

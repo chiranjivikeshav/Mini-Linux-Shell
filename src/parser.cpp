@@ -66,6 +66,10 @@ std::unique_ptr<ASTNode> Parser::parseCommand() {
         pos++;
     }
 
+    if (!cmd->args.empty()) {
+        cmd->name = cmd->args[0];
+    }
+
     while (peek().type == TokenType::REDIRECT) {
         Redirection rd;
         std::string op = peek().value;
