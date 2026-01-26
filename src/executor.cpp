@@ -8,23 +8,27 @@
 #include <fcntl.h>
 #include <cstdlib>
 
-void Executor::execute(const Command& cmd)
+int Executor::execute(const Command& cmd)
 {
     if (cmd.name == "exit")
     {
         exit(0);
-    }else if (cmd.name == "cd")
-    {
-        handleCD(cmd);
-        return;
     }
+    if (cmd.name == "cd")
+    {
+        return handleCD(cmd);
+    }
+    return handleChildProcess(cmd);
+}
 
+int Executor::handleChildProcess(const Command& cmd)
+{
     pid_t pid = fork();
 
     if (pid < 0)
     {
         perror("fork failed");
-        return;
+        return 1;
     }
 
     if (pid == 0)
@@ -38,12 +42,16 @@ void Executor::execute(const Command& cmd)
         execvp(cmd.name.c_str(), argv.data());
 
         perror("execution failed");
-        _exit(1);
+        _exit(127);
     }
-    waitpid(pid, nullptr, 0);
+    int status;
+    waitpid(pid, &status, 0);
+    if (WIFEXITED(status))
+        return WEXITSTATUS(status);
+    return 0;
 }
 
-void Executor::handleCD(const Command& cmd)
+int Executor::handleCD(const Command& cmd)
 {
     std::string targetDir;
     if (cmd.args.size() == 1 || cmd.args[1] == "~")
@@ -56,7 +64,9 @@ void Executor::handleCD(const Command& cmd)
     if (chdir(targetDir.c_str()) < 0)
     {
         perror("command failed");
+        return 1;
     }
+    return 0;
 }
 
 void Executor::handleRedirection(const std::vector<Redirection>& rds)

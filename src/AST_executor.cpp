@@ -15,8 +15,7 @@ int ASTExecutor::execute(const ASTNode* node)
         {
             auto* cmd = static_cast<const Command*>(node);
             Executor exec;
-            exec.execute(*cmd);
-            return 0;
+            return exec.execute(*cmd);
         }
 
     case NodeType::SEQUENCE:

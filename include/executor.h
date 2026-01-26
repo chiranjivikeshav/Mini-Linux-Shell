@@ -7,12 +7,13 @@
 class Executor
 {
 public:
-    void execute(const Command& cmd);
+    int execute(const Command& cmd);
 
 private:
-    void handleCD(const Command& cmd);
+    int handleCD(const Command& cmd);
     void handleRedirection(const std::vector<Redirection>& rds);
     void redirect(int targetFd, const std::string& file, int flags);
+    int handleChildProcess(const Command& cmd);
 };
 
 #endif
