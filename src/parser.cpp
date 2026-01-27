@@ -1,6 +1,7 @@
 #include "parser.h"
 #include "command.h"
 #include <sstream>
+#include "subshellNode.h"
 
 Parser::Parser(std::vector<Token>& t):tokens(t), pos(0)
 {

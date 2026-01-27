@@ -10,7 +10,8 @@ struct SubshellNode : ASTNode {
     std::unique_ptr<ASTNode> child;
     std::vector<Redirection> redirections;
 
-    SubshellNode() {
+    explicit SubshellNode(std::unique_ptr<ASTNode>inner) {
+        this->child = std::move(inner);
         type = NodeType::SUBSHELL;
     }
 };
