@@ -4,6 +4,7 @@
 #include <sys/wait.h>
 #include <iostream>
 #include "executor.h"
+#include "subshellNode.h"
 
 int ASTExecutor::execute(const ASTNode* node)
 {
@@ -74,6 +75,27 @@ int ASTExecutor::execute(const ASTNode* node)
             waitpid(rightPid, &status, 0);
             return WEXITSTATUS(status);
         }
+
+    case NodeType::SUBSHELL:
+        {
+            const auto sub = dynamic_cast<const SubshellNode*>(node);
+            return executeSubshell(sub->child.get());
+        }
     }
     return 0;
+}
+
+int ASTExecutor::executeSubshell(const ASTNode* subtree)
+{
+    pid_t pid = fork();
+    if (pid == 0)
+    {
+        const int status = execute(subtree);
+        _exit(status);
+    }
+    int status;
+    waitpid(pid, &status, 0);
+    if (WIFEXITED(status))
+        return WEXITSTATUS(status);
+    return 1;
 }
