@@ -11,6 +11,8 @@ enum class TokenType {
     OR,         // ||
     SEQUENCE,   // ;
     REDIRECT,   // > >> < 2>
+    LPAREN,     // (
+    RPAREN,     // )
     END
 };
 

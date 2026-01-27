@@ -16,6 +16,7 @@ std::unique_ptr<ASTNode> Parser::parseSequence() {
     auto node = parseLogical();
 
     while (match(TokenType::SEQUENCE)) {
+
         auto right = parseLogical();
         auto parent = std::make_unique<ASTNode>();
         parent->type = NodeType::SEQUENCE;
@@ -45,10 +46,10 @@ std::unique_ptr<ASTNode> Parser::parseLogical() {
 }
 
 std::unique_ptr<ASTNode> Parser::parsePipeline() {
-    auto node = parseCommand();
+    auto node = parsePrimary();
 
     while (match(TokenType::PIPE)) {
-        auto right = parseCommand();
+        auto right = parsePrimary();
         auto parent = std::make_unique<ASTNode>();
         parent->type = NodeType::PIPE;
         parent->left = std::move(node);
@@ -56,6 +57,20 @@ std::unique_ptr<ASTNode> Parser::parsePipeline() {
         node = std::move(parent);
     }
     return node;
+}
+
+std::unique_ptr<ASTNode> Parser::parsePrimary() {
+    if (match(TokenType::LPAREN)) {
+        auto inner = parseSequence();
+
+        if (!match(TokenType::RPAREN)) {
+            throw std::runtime_error("expected ')'");
+        }
+
+        return std::make_unique<SubshellNode>(std::move(inner));
+    }
+
+    return parseCommand();
 }
 
 std::unique_ptr<ASTNode> Parser::parseCommand() {

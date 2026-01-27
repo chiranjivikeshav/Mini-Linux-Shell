@@ -19,6 +19,7 @@ private:
     std::unique_ptr<ASTNode> parseSequence();
     std::unique_ptr<ASTNode> parseLogical();
     std::unique_ptr<ASTNode> parsePipeline();
+    std::unique_ptr<ASTNode> parsePrimary();
     std::unique_ptr<ASTNode> parseCommand();
 
     void setRedirectionType(const std::string& arg, Redirection& rd);
