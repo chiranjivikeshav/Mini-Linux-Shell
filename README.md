@@ -32,7 +32,7 @@ The shell follows a modular design:
   - Sequence
   - Subshell
 - ### Executor
-  - Recursively evaluates AST nodes
+  - Recursively evaluates AST nodes using post-order traversal
   - Forks processes where required
   - Preserves shell state for built-ins
 # Tech Stack
